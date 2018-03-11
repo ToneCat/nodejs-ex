@@ -1,108 +1,148 @@
-//  OpenShift sample Node application
-var express = require('express'),
-    app     = express(),
-    morgan  = require('morgan');
+var http = require('http');
+    var fs = require('fs');
+    var url = require('url');
+    const ccxt = require ('ccxt');
+    var path = require('path');
+   
+
+
+    //var another = require('./fortnite.js');
+
+    //Lets define a port we want to listen to
     
-Object.assign=require('object-assign')
 
-app.engine('html', require('ejs').renderFile);
-app.use(morgan('combined'))
+    
+var express = require ('express');
+var app= express();
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
-    mongoURLLabel = "";
 
-if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
-  var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
-      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
-      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
-      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
-      mongoPassword = process.env[mongoServiceName + '_PASSWORD']
-      mongoUser = process.env[mongoServiceName + '_USER'];
 
-  if (mongoHost && mongoPort && mongoDatabase) {
-    mongoURLLabel = mongoURL = 'mongodb://';
-    if (mongoUser && mongoPassword) {
-      mongoURL += mongoUser + ':' + mongoPassword + '@';
-    }
-    // Provide UI label that excludes user id and pw
-    mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
-    mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
+app.get('/', function(req, res){
+res.sendFile(path.join(__dirname, '/index.html'));
 
-  }
-}
-var db = null,
-    dbDetails = new Object();
+});
 
-var initDb = function(callback) {
-  if (mongoURL == null) return;
 
-  var mongodb = require('mongodb');
-  if (mongodb == null) return;
 
-  mongodb.connect(mongoURL, function(err, conn) {
-    if (err) {
-      callback(err);
-      return;
-    }
+app.get('/users', function(req, res) {
 
-    db = conn;
-    dbDetails.databaseName = db.databaseName;
-    dbDetails.url = mongoURLLabel;
-    dbDetails.type = 'MongoDB';
+ const Fortnite = require("fortnite-api");
+let fortniteAPI = new Fortnite(["tcatalfamo17@gmail.com", "wacky1444", "MzRhMDJjZjhmNDQxNGUyOWIxNTkyMTg3NmRhMzZmOWE6ZGFhZmJjY2M3Mzc3NDUwMzlkZmZlNTNkOTRmYzc2Y2Y=", "ZWM2ODRiOGM2ODdmNDc5ZmFkZWEzY2IyYWQ4M2Y1YzY6ZTFmMzFjMjExZjI4NDEzMTg2MjYyZDM3YTEzZmM4NGQ="]);
+var username = req.param('id');
+var console2 = "xb1";
+fortniteAPI.login()
+.then(()=> {
+ fortniteAPI.getStatsBR(username, console2)
+  .then((stats) => {
 
-    console.log('Connected to MongoDB at: %s', mongoURL);
+//  var hello = ('stats', JSON.stringify(stats.info.username)); 
+//  var two = ('stats', JSON.stringify(stats.group.squad.wins));  
+ res.send(stats);
+  console.log("got get");
+
+
+      
+  })
+  .catch((err) => {
+    console.log(err);
   });
-};
 
-app.get('/', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    var col = db.collection('counts');
-    // Create a document with request IP and current time of request
-    col.insert({ip: req.ip, date: Date.now()});
-    col.count(function(err, count){
-      if (err) {
-        console.log('Error running count. Message:\n'+err);
-      }
-      res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
-    });
-  } else {
-    res.render('index.html', { pageCountMessage : null});
-  }
 });
 
-app.get('/pagecount', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    db.collection('counts').count(function(err, count ){
-      res.send('{ pageCount: ' + count + '}');
-    });
-  } else {
-    res.send('{ pageCount: -1 }');
-  }
+
+
+
+    
+}); 
+ 
+
+  
+app.post ('/', function(req,res){
+    res.send('_callback(\'{"message": "Hello world!"}\')');
+    console.log("got post");
 });
 
-// error handling
-app.use(function(err, req, res, next){
-  console.error(err.stack);
-  res.status(500).send('Something bad happened!');
+var server = app.listen(3000, function(req,res){
+ 
+    console.log('listening on port 3000');
 });
 
-initDb(function(err){
-  console.log('Error connecting to Mongo. Message:\n'+err);
+     
+ 
+
+     
+
+
+
+
+
+//var fs = require('fs');
+
+
+
+
+
+/*
+
+var http = require('http');
+    var fs = require('fs');
+    var url = require('url');
+    const ccxt = require ('ccxt')
+    var path = require('path');
+
+var express = require ('express');
+var app= express();
+
+app.get('/', function(req, res) {
+res.sendFile(path.join(__dirname, '/index.html'));
+
 });
 
-app.listen(port, ip);
-console.log('Server running on http://%s:%s', ip, port);
 
-module.exports = app ;
+
+app.get('/write', function(req, res) {
+
+  var exchange = new ccxt[getExchange()] ();
+(async () => {
+var hello = (await (exchange.fetchTicker (''+getCurrency()+'/USD'))) // ticker for BTC/USD
+ //console.log(hello.last);
+var result2 = ('hello', JSON.stringify(hello.last));
+ res.send(result2);
+  console.log("got get");
+
+
+    
+}) ()
+ });
+
+  
+app.post ('/', function(req,res){
+    res.send('_callback(\'{"message": "Hello world!"}\')');
+    console.log("got post");
+});
+
+var server = app.listen(3000, function(req,res){
+ 
+    console.log('listening on port 3000');
+});
+
+
+
+function getExchange() {
+    var exchange;
+    var exchange_Name = [];
+    exchange = 'gdax';
+   
+
+    return exchange;
+
+}
+function getCurrency(){
+var currency;
+currency = 'LTC';
+return currency;
+
+}
+
+
+*/
