@@ -1,18 +1,15 @@
 {
-  "name": "myapp",
+  "name": "npmtest",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "last": "last",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2",
-    "fortnite-api": "^2.6.1"
-  },
-  "devDependencies": {},
-  "description": ""
+    "express": "^4.16.2"
+  }
 }
